@@ -4,14 +4,12 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         git \
         unzip \
-        libcurl4-openssl-dev \
         libsqlite3-dev \
         libonig-dev \
         libxml2-dev \
     && docker-php-ext-install \
         pdo_sqlite \
         sqlite3 \
-        curl \
         mbstring \
         bcmath \
         pcntl \
