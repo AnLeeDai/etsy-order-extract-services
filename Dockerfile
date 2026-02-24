@@ -1,6 +1,6 @@
 FROM php:8.3-cli-bookworm
 
-RUN apt-get update \
+RUN apt-get update --allow-releaseinfo-change \
     && apt-get install -y --no-install-recommends \
         git \
         unzip \
@@ -9,7 +9,6 @@ RUN apt-get update \
         libxml2-dev \
     && docker-php-ext-install \
         pdo_sqlite \
-        sqlite3 \
         mbstring \
         bcmath \
         pcntl \
