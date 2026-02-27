@@ -155,32 +155,6 @@
             });
         }
 
-        // ── Card / Table view toggle ──────────────────────────────────────────────
-        var panel = document.getElementById('result-panel');
-        var cardView = document.getElementById('card-view');
-        var tableView = document.getElementById('table-view');
-
-        if (panel) {
-            var btns = panel.querySelectorAll('[data-view-mode]');
-
-            function setMode(m) {
-                var isCard = m !== 'table';
-                if (cardView) cardView.classList.toggle('hidden', !isCard);
-                if (tableView) tableView.classList.toggle('hidden', isCard);
-                btns.forEach(function(b) {
-                    b.classList.toggle('active', b.getAttribute('data-view-mode') === m);
-                });
-            }
-
-            btns.forEach(function(b) {
-                b.addEventListener('click', function() {
-                    setMode(b.getAttribute('data-view-mode') || 'card');
-                });
-            });
-
-            setMode('card');
-        }
-
         // ── Copy to Google Sheets ─────────────────────────────────────────────────
         var copyBtn = document.getElementById('copy-sheet-button');
         var copyStatus = document.getElementById('copy-sheet-status');
@@ -222,16 +196,6 @@
                 );
             });
         }
-
-        /* ── History: expand/collapse item detail rows ── */
-        document.querySelectorAll('.items-expand-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var target = document.getElementById(btn.getAttribute('data-target'));
-                if (!target) return;
-                var open = target.classList.toggle('open');
-                btn.querySelector('svg').style.transform = open ? 'rotate(180deg)' : '';
-            });
-        });
 
         /* ── Support: copy account number ── */
         var copyAcctBtn  = document.getElementById('copy-acct-btn');

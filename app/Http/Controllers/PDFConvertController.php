@@ -52,6 +52,7 @@ class PDFConvertController extends Controller
 
         $sheetHeaders = [
             'order_number',
+            'ship_to',
             'sku',
             'title',
             'item_count',
@@ -165,6 +166,7 @@ class PDFConvertController extends Controller
             if ($items === []) {
                 $rows[] = [
                     $orderNumber,
+                    $shipTo,
                     '',
                     '',
                     $itemCount,
@@ -178,6 +180,7 @@ class PDFConvertController extends Controller
             foreach ($items as $item) {
                 $rows[] = [
                     $orderNumber,
+                    $shipTo,
                     $this->sanitizeForSheet((string) ($item['sku'] ?? '')),
                     $this->sanitizeForSheet((string) ($item['title'] ?? '')),
                     $itemCount,
