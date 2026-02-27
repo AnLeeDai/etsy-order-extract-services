@@ -1,0 +1,3 @@
+cd D:\laragon\www\etsy-order-extract-services
+php artisan native:build win x64 --no-interaction
+Compress-Archive -Path "nativephp/electron/dist/win-unpacked/*" -DestinationPath "dist/Etsy-Order-Extract-1.0.0-portable.zip" -CompressionLevel Optimal -Force
