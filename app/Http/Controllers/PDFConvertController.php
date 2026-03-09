@@ -183,7 +183,7 @@ class PDFConvertController extends Controller
                     $shipTo,
                     $this->sanitizeForSheet((string) ($item['sku'] ?? '')),
                     $this->sanitizeForSheet((string) ($item['title'] ?? '')),
-                    $itemCount,
+                    (string) ($item['quantity'] ?? $itemCount),
                     $this->sanitizeForSheet((string) ($item['personalization'] ?? '')),
                     $this->sanitizeForSheet((string) ($item['size'] ?? '')),
                 ];
