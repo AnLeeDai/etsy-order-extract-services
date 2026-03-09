@@ -332,50 +332,8 @@
             });
         }
 
-        // ── Copy to Google Sheets ─────────────────────────────────────────────────
-        var copyBtn = document.getElementById('copy-sheet-button');
-        var copyStatus = document.getElementById('copy-sheet-status');
-        var exportText = document.getElementById('sheet-export-text');
-
-        if (copyBtn && exportText) {
-            copyBtn.addEventListener('click', async function() {
-                var text = exportText.value || '';
-                if (!text) {
-                    showToast('Không có dữ liệu để copy.', 'err');
-                    return;
-                }
-
-                var ok = false;
-                try {
-                    await navigator.clipboard.writeText(text);
-                    ok = true;
-                } catch (_) {
-                    var tmp = document.createElement('textarea');
-                    tmp.value = text;
-                    tmp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;font-family:monospace;color:#000;background:#fff;border:none';
-                    document.body.appendChild(tmp);
-                    tmp.focus();
-                    tmp.select();
-                    try { ok = document.execCommand('copy'); } catch (x) {}
-                    document.body.removeChild(tmp);
-                }
-
-                if (copyStatus) {
-                    copyStatus.textContent = ok ? ' Đã copy!' : ' Thất bại';
-                    copyStatus.className = 'copy-status ' + (ok ? 'ok' : 'err');
-                    setTimeout(function() {
-                        copyStatus.textContent = '';
-                        copyStatus.className = 'copy-status';
-                    }, 3000);
-                }
-
-                showToast(
-                    ok ? 'Đã copy! Paste vào Google Sheets bằng Ctrl+V.' :
-                    'Copy thất bại, hãy thử thủ công.',
-                    ok ? 'ok' : 'err'
-                );
-            });
-        }
+        // Handle copy button for server-rendered results (non-AJAX flow)
+        attachCopyHandler();
 
         /* ── Support: copy account number ── */
         var copyAcctBtn  = document.getElementById('copy-acct-btn');

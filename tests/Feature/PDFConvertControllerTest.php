@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -11,6 +12,7 @@ use Tests\TestCase;
 
 class PDFConvertControllerTest extends TestCase
 {
+    use RefreshDatabase;
     #[Test]
     public function it_supports_uploading_multiple_pdf_files_in_one_request(): void
     {
@@ -64,7 +66,7 @@ TEXT;
                 ->andReturn($documentOne, $documentTwo);
         });
 
-        $response = $this->post('/extract', [
+        $response = $this->followingRedirects()->post('/extract', [
             'pdf_files' => [
                 UploadedFile::fake()->create('first.pdf', 100, 'application/pdf'),
                 UploadedFile::fake()->create('second.pdf', 100, 'application/pdf'),

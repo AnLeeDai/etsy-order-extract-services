@@ -12,6 +12,12 @@ use Throwable;
 
 class PDFConvertController extends Controller
 {
+    public function __construct(
+        private readonly Parser $parser,
+        private readonly EtsyOrderPdfParser $etsyOrderPdfParser,
+    ) {
+    }
+
     public function index()
     {
         $results      = session('pdf_results');
@@ -30,12 +36,6 @@ class PDFConvertController extends Controller
         $logs = ExtractionLog::latest()->paginate(50);
 
         return view('history', compact('logs'));
-    }
-
-    public function __construct(
-        private readonly Parser $parser,
-        private readonly EtsyOrderPdfParser $etsyOrderPdfParser,
-    ) {
     }
 
     public function extract(Request $request)
@@ -64,19 +64,7 @@ class PDFConvertController extends Controller
 
         // Persist each file result to the database
         foreach ($results as $entry) {
-            $result = is_array($entry['result'] ?? null) ? $entry['result'] : [];
-            $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
-
-            ExtractionLog::create([
-                'file_name'    => $entry['file_name'],
-                'success'      => $entry['success'] ?? false,
-                'error'        => $entry['error'] ?? null,
-                'order_number' => $result['order_number'] ?? null,
-                'ship_to'      => $shipToData['full'] ?? null,
-                'item_count'   => (int) ($result['item_count'] ?? 0),
-                'items'        => $result['items'] ?? null,
-                'raw_result'   => $result ?: null,
-            ]);
+            $this->persistExtractionLog($entry);
         }
 
         if ($request->wantsJson()) {
@@ -105,21 +93,7 @@ class PDFConvertController extends Controller
 
         $entry = $this->extractFromUploadedFile($validated['pdf_file']);
 
-        if ($entry['success']) {
-            $result     = is_array($entry['result'] ?? null) ? $entry['result'] : [];
-            $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
-
-            ExtractionLog::create([
-                'file_name'    => $entry['file_name'],
-                'success'      => true,
-                'error'        => null,
-                'order_number' => $result['order_number'] ?? null,
-                'ship_to'      => $shipToData['full'] ?? null,
-                'item_count'   => (int) ($result['item_count'] ?? 0),
-                'items'        => $result['items'] ?? null,
-                'raw_result'   => $result ?: null,
-            ]);
-        }
+        $this->persistExtractionLog($entry);
 
         return response()->json([
             'file_name'   => $entry['file_name'],
@@ -232,5 +206,30 @@ class PDFConvertController extends Controller
     private function sanitizeForSheet(string $value): string
     {
         return trim((string) preg_replace('/\s+/u', ' ', str_replace(["\t", "\r", "\n"], ' ', $value)));
+    }
+
+    /**
+     * @param array{
+     *     file_name: string,
+     *     success: bool,
+     *     result: array<string, mixed>|null,
+     *     error: string|null
+     * } $entry
+     */
+    private function persistExtractionLog(array $entry): void
+    {
+        $result     = is_array($entry['result'] ?? null) ? $entry['result'] : [];
+        $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
+
+        ExtractionLog::create([
+            'file_name'    => $entry['file_name'],
+            'success'      => $entry['success'] ?? false,
+            'error'        => $entry['error'] ?? null,
+            'order_number' => $result['order_number'] ?? null,
+            'ship_to'      => $shipToData['full'] ?? null,
+            'item_count'   => (int) ($result['item_count'] ?? 0),
+            'items'        => $result['items'] ?? null,
+            'raw_result'   => $result ?: null,
+        ]);
     }
 }
