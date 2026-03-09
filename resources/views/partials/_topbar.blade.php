@@ -9,7 +9,7 @@
                 <line x1="16" y1="17" x2="8" y2="17" />
             </svg>
         </div>
-        <span>Etsy Order Extract</span>
+        <span>DropSheet</span>
     </a>
     <div class="topbar-right">
         <a href="{{ route('history') }}" class="topbar-support-btn {{ request()->routeIs('history') ? 'active' : '' }}">

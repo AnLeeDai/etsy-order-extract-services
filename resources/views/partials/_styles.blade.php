@@ -1185,6 +1185,13 @@
         margin-top: .2rem;
     }
 
+    .history-header-right {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
     .history-stats {
         display: flex;
         gap: .75rem;
@@ -1314,6 +1321,42 @@
 
     .items-expand-btn svg {
         transition: transform .2s;
+    }
+
+    /* ── Per-row copy button ── */
+    .row-actions-cell {
+        padding: .5rem .75rem !important;
+        text-align: center;
+        width: 36px;
+    }
+
+    .row-copy-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--ink-3);
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+        flex-shrink: 0;
+    }
+
+    .row-copy-btn svg { width: 13px; height: 13px; pointer-events: none; }
+
+    .row-copy-btn:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+    .row-copy-btn--done {
+        background: var(--green-soft);
+        border-color: var(--green);
+        color: var(--green-text);
     }
 
     /* ── Expandable detail row ── */

@@ -1,6 +1,6 @@
 ﻿@extends('layouts.main')
 
-@section('title', 'Etsy Order Extract')
+@section('title', 'DropSheet')
 
 @push('body-before')
 {{-- Loading overlay --}}
