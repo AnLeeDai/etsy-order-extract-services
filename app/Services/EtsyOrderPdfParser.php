@@ -44,7 +44,7 @@ class EtsyOrderPdfParser
                 'name' => $shipToLines[0] ?? null,
                 'lines' => $shipToLines,
                 'address_lines' => array_slice($shipToLines, 1),
-                'full' => implode(', ', $shipToLines),
+                'full' => implode("\n", $shipToLines),
             ],
             'items' => $items,
         ];
