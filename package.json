@@ -1,5 +1,6 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
+    "name": "dropsheet",
     "private": true,
     "type": "module",
     "scripts": {
@@ -14,10 +15,5 @@
         "laravel-vite-plugin": "^2.0",
         "tailwindcss": "^4.0.7",
         "vite": "^7.0.4"
-    },
-    "optionalDependencies": {
-        "@rollup/rollup-linux-x64-gnu": "4.9.5",
-        "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
-        "lightningcss-linux-x64-gnu": "^1.29.1"
     }
 }

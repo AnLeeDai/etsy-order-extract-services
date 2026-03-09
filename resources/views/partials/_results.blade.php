@@ -5,16 +5,18 @@
             <div class="result-header">
                 <div class="result-title-group">
                     <h2>Kết quả trích xuất</h2>
-                    <p>Copy sang Google Sheets bằng nút bên dưới</p>
+                    <p>{{ count($results) }} file</p>
                 </div>
-                <div class="result-count">
-                    <svg viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px">
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                        <path fill-rule="evenodd"
-                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {{ count($results) }} file
+                <div style="display:flex;align-items:center;gap:.75rem">
+                    <textarea id="sheet-export-text" style="display:none" readonly spellcheck="false">{{ $sheetText }}</textarea>
+                    <button type="button" id="copy-sheet-button" class="btn-copy">
+                        <svg viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                        </svg>
+                        Copy sang Google Sheets
+                    </button>
+                    <span id="copy-sheet-status" class="copy-status" aria-live="polite"></span>
                 </div>
             </div>
 
@@ -33,7 +35,7 @@
                             @forelse ($sheetRows as $sheetRow)
                                 <tr>
                                     @foreach ($sheetRow as $cell)
-                                        <td>{{ $cell }}</td>
+                                        <td>{!! nl2br(e($cell)) !!}</td>
                                     @endforeach
                                 </tr>
                             @empty
@@ -46,38 +48,12 @@
                         </tbody>
                     </table>
                 </div>
-
-                {{-- Google Sheets export --}}
-                <div class="sheet-export">
-                    <div class="sheet-export-header">
-                        <svg viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd"
-                                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span>Copy vào Google Sheets</span>
-                        <small>&middot; tab-delimited, paste trực tiếp</small>
-                    </div>
-                    <textarea id="sheet-export-text" readonly spellcheck="false">{{ $sheetText }}</textarea>
-                    <div class="sheet-actions">
-                        <button type="button" id="copy-sheet-button" class="btn-copy">
-                            <svg viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                                <path
-                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                            </svg>
-                            Copy dữ liệu
-                        </button>
-                        <span id="copy-sheet-status" class="copy-status" aria-live="polite"></span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 @else
     {{-- Empty state: no results yet --}}
-    <div class="result-card"
+    <div id="empty-state-panel" class="result-card"
         style="border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface)">
         <div class="empty-state">
             <div class="empty-icon">

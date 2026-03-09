@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Ủng hộ tác giả – PDF Convert Services')
+@section('title', 'Ủng hộ tác giả – DropSheet')
 
 @section('content')
 <div class="support-page">

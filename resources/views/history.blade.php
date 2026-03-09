@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Lịch sử trích xuất – PDF Convert Services')
+@section('title', 'Lịch sử trích xuất – DropSheet')
 
 @section('content')
 <div class="page">

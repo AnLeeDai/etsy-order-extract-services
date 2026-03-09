@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExtractionLog;
 use App\Services\EtsyOrderPdfParser;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Smalot\PdfParser\Parser;
@@ -11,6 +12,12 @@ use Throwable;
 
 class PDFConvertController extends Controller
 {
+    public function __construct(
+        private readonly Parser $parser,
+        private readonly EtsyOrderPdfParser $etsyOrderPdfParser,
+    ) {
+    }
+
     public function index()
     {
         $results      = session('pdf_results');
@@ -29,12 +36,6 @@ class PDFConvertController extends Controller
         $logs = ExtractionLog::latest()->paginate(50);
 
         return view('history', compact('logs'));
-    }
-
-    public function __construct(
-        private readonly Parser $parser,
-        private readonly EtsyOrderPdfParser $etsyOrderPdfParser,
-    ) {
     }
 
     public function extract(Request $request)
@@ -63,19 +64,7 @@ class PDFConvertController extends Controller
 
         // Persist each file result to the database
         foreach ($results as $entry) {
-            $result = is_array($entry['result'] ?? null) ? $entry['result'] : [];
-            $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
-
-            ExtractionLog::create([
-                'file_name'    => $entry['file_name'],
-                'success'      => $entry['success'] ?? false,
-                'error'        => $entry['error'] ?? null,
-                'order_number' => $result['order_number'] ?? null,
-                'ship_to'      => $shipToData['full'] ?? null,
-                'item_count'   => (int) ($result['item_count'] ?? 0),
-                'items'        => $result['items'] ?? null,
-                'raw_result'   => $result ?: null,
-            ]);
+            $this->persistExtractionLog($entry);
         }
 
         if ($request->wantsJson()) {
@@ -94,6 +83,24 @@ class PDFConvertController extends Controller
             ->with('pdf_results', $results)
             ->with('pdf_sheet_headers', $sheetHeaders)
             ->with('pdf_sheet_rows', $sheetRows);
+    }
+
+    public function extractSingle(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'pdf_file' => ['required', 'file', 'mimetypes:application/pdf', 'max:20480'],
+        ]);
+
+        $entry = $this->extractFromUploadedFile($validated['pdf_file']);
+
+        $this->persistExtractionLog($entry);
+
+        return response()->json([
+            'file_name'   => $entry['file_name'],
+            'success'     => $entry['success'],
+            'error'       => $entry['error'],
+            'sheet_rows'  => $this->buildSheetRows([$entry]),
+        ]);
     }
 
     /**
@@ -159,33 +166,36 @@ class PDFConvertController extends Controller
             $result = is_array($entry['result'] ?? null) ? $entry['result'] : [];
             $orderNumber = $this->sanitizeForSheet((string) ($result['order_number'] ?? ''));
             $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
-            $shipTo = $this->sanitizeForSheet((string) ($shipToData['full'] ?? ''));
+            $shipToLines = is_array($shipToData['lines'] ?? null) ? $shipToData['lines'] : [];
+            $shipTo = $shipToLines !== []
+                ? implode(', ', $shipToLines)
+                : $this->sanitizeForSheet((string) ($shipToData['full'] ?? ''));
             $itemCount = (string) ($result['item_count'] ?? '');
             $items = is_array($result['items'] ?? null) ? $result['items'] : [];
 
             if ($items === []) {
-                $rows[] = [
-                    $orderNumber,
-                    $shipTo,
-                    '',
-                    '',
-                    $itemCount,
-                    '',
-                    '',
-                ];
-
                 continue;
             }
 
             foreach ($items as $item) {
+                $sku   = $this->sanitizeForSheet((string) ($item['sku'] ?? ''));
+                $title = $this->sanitizeForSheet((string) ($item['title'] ?? ''));
+                $personalization = $this->sanitizeForSheet((string) ($item['personalization'] ?? ''));
+                $size  = $this->sanitizeForSheet((string) ($item['size'] ?? ''));
+
+                // Skip rows with no meaningful product data (avoids blank rows in export)
+                if ($sku === '' && $title === '' && $personalization === '' && $size === '') {
+                    continue;
+                }
+
                 $rows[] = [
                     $orderNumber,
                     $shipTo,
-                    $this->sanitizeForSheet((string) ($item['sku'] ?? '')),
-                    $this->sanitizeForSheet((string) ($item['title'] ?? '')),
-                    $itemCount,
-                    $this->sanitizeForSheet((string) ($item['personalization'] ?? '')),
-                    $this->sanitizeForSheet((string) ($item['size'] ?? '')),
+                    $sku,
+                    $title,
+                    (string) ($item['quantity'] ?? $itemCount),
+                    $personalization,
+                    $size,
                 ];
             }
         }
@@ -196,5 +206,30 @@ class PDFConvertController extends Controller
     private function sanitizeForSheet(string $value): string
     {
         return trim((string) preg_replace('/\s+/u', ' ', str_replace(["\t", "\r", "\n"], ' ', $value)));
+    }
+
+    /**
+     * @param array{
+     *     file_name: string,
+     *     success: bool,
+     *     result: array<string, mixed>|null,
+     *     error: string|null
+     * } $entry
+     */
+    private function persistExtractionLog(array $entry): void
+    {
+        $result     = is_array($entry['result'] ?? null) ? $entry['result'] : [];
+        $shipToData = is_array($result['ship_to'] ?? null) ? $result['ship_to'] : [];
+
+        ExtractionLog::create([
+            'file_name'    => $entry['file_name'],
+            'success'      => $entry['success'] ?? false,
+            'error'        => $entry['error'] ?? null,
+            'order_number' => $result['order_number'] ?? null,
+            'ship_to'      => $shipToData['full'] ?? null,
+            'item_count'   => (int) ($result['item_count'] ?? 0),
+            'items'        => $result['items'] ?? null,
+            'raw_result'   => $result ?: null,
+        ]);
     }
 }

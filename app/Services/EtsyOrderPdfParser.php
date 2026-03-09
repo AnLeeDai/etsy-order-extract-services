@@ -44,7 +44,7 @@ class EtsyOrderPdfParser
                 'name' => $shipToLines[0] ?? null,
                 'lines' => $shipToLines,
                 'address_lines' => array_slice($shipToLines, 1),
-                'full' => implode(', ', $shipToLines),
+                'full' => implode("\n", $shipToLines),
             ],
             'items' => $items,
         ];
@@ -232,7 +232,7 @@ class EtsyOrderPdfParser
                     continue;
                 }
 
-                if (preg_match('/^Size:\s*(.+)$/iu', $line, $matches)) {
+                if (preg_match('/^(?:Size|Style):\s*(.+)$/iu', $line, $matches)) {
                     $item['size'] = $matches[1];
                     $cursor++;
                     continue;
@@ -288,7 +288,7 @@ class EtsyOrderPdfParser
 
     private function isItemMetadataLine(string $line): bool
     {
-        return (bool) preg_match('/^(SKU|Size|Personalization):\s*/iu', $line);
+        return (bool) preg_match('/^(SKU|Size|Style|Personalization):\s*/iu', $line);
     }
 
     private function isItemPriceLine(string $line): bool

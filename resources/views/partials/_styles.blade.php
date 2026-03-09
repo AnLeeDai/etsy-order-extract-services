@@ -925,6 +925,32 @@
         height: 15px;
     }
 
+    .btn-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--ink-3);
+        font-size: .8125rem;
+        font-weight: 600;
+        padding: .375rem .875rem;
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+    }
+
+    .btn-reset:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        color: #b91c1c;
+    }
+
+    .btn-reset svg {
+        width: 14px;
+        height: 14px;
+    }
+
     .copy-status {
         font-size: .8125rem;
         font-weight: 500;
@@ -1032,6 +1058,54 @@
         color: var(--ink-3);
     }
 
+    .loading-progress-wrap {
+        width: 240px;
+        height: 6px;
+        background: var(--border);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    .loading-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent), #818cf8);
+        border-radius: 9999px;
+        transition: width .35s ease;
+    }
+
+    .loading-filename {
+        font-size: .8125rem;
+        color: var(--ink-3);
+        max-width: 280px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-height: 1.2em;
+    }
+
+    /* ── File chip status states ── */
+    .file-chip.chip-processing {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        animation: chip-pulse 1s ease-in-out infinite;
+    }
+
+    .file-chip.chip-done {
+        border-color: var(--green);
+        background: #f0fdf4;
+    }
+
+    .file-chip.chip-error {
+        border-color: var(--red);
+        background: var(--red-soft);
+    }
+
+    @keyframes chip-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .65; }
+    }
+
     /* ── Toast ── */
     #toast {
         position: fixed;
@@ -1109,6 +1183,13 @@
         font-size: .875rem;
         color: var(--ink-3);
         margin-top: .2rem;
+    }
+
+    .history-header-right {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
     }
 
     .history-stats {
@@ -1240,6 +1321,42 @@
 
     .items-expand-btn svg {
         transition: transform .2s;
+    }
+
+    /* ── Per-row copy button ── */
+    .row-actions-cell {
+        padding: .5rem .75rem !important;
+        text-align: center;
+        width: 36px;
+    }
+
+    .row-copy-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--ink-3);
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+        flex-shrink: 0;
+    }
+
+    .row-copy-btn svg { width: 13px; height: 13px; pointer-events: none; }
+
+    .row-copy-btn:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+    .row-copy-btn--done {
+        background: var(--green-soft);
+        border-color: var(--green);
+        color: var(--green-text);
     }
 
     /* ── Expandable detail row ── */
